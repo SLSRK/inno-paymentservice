@@ -5,12 +5,13 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@Document(collation = "payments")
+@Document(collection = "payments")
 public class Payment {
 
     @Id
@@ -25,7 +26,7 @@ public class Payment {
     @Field(name = "status")
     PaymentStatus status;
 
-    @Field(name = "timestamp")
+    @Field(name = "timestamp", targetType = FieldType.STRING)
     LocalDateTime timestamp;
 
     @Field(name = "payment_amount")

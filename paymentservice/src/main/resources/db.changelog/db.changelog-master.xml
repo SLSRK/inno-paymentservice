@@ -12,4 +12,42 @@
         <comment>create_payments_collection</comment>
         <mongodb:createCollection collectionName="payments"/>
     </changeSet>
+
+    <changeSet id="2-create-indexes" author="slsrk">
+        <mongodb:createIndex collectionName="payments">
+            <mongodb:keys>
+                { "order_id": 1 }
+            </mongodb:keys>
+            <mongodb:options>
+                { "name": "idx_order_id" }
+            </mongodb:options>
+        </mongodb:createIndex>
+
+        <mongodb:createIndex collectionName="payments">
+            <mongodb:keys>
+                { "user_id": 1 }
+            </mongodb:keys>
+            <mongodb:options>
+                { "name": "idx_user_id" }
+            </mongodb:options>
+        </mongodb:createIndex>
+
+        <mongodb:createIndex collectionName="payments">
+            <mongodb:keys>
+                { "status": 1 }
+            </mongodb:keys>
+            <mongodb:options>
+                { "name": "idx_status" }
+            </mongodb:options>
+        </mongodb:createIndex>
+
+        <mongodb:createIndex collectionName="payments">
+            <mongodb:keys>
+                { "timestamp": 1 }
+            </mongodb:keys>
+            <mongodb:options>
+                { "name": "idx_timestamp" }
+            </mongodb:options>
+        </mongodb:createIndex>
+    </changeSet>
 </databaseChangeLog>
