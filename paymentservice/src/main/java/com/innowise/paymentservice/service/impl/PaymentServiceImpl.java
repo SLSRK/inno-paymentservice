@@ -1,6 +1,7 @@
 package com.innowise.paymentservice.service.impl;
 
 import com.innowise.paymentservice.client.ExternalApiClient;
+import com.innowise.paymentservice.exception.DataException;
 import com.innowise.paymentservice.exception.NotFoundException;
 import com.innowise.paymentservice.mapper.PaymentMapper;
 import com.innowise.paymentservice.model.dto.PaymentCreateDto;
@@ -59,13 +60,17 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponseDto pay(String id) {
         Payment payment = paymentRepository.findById(id).
                 orElseThrow(() -> new NotFoundException("Payment not found"));
-
+        if(payment.getStatus().equals(PaymentStatus.SUCCESS)) {
+            throw new DataException("Payment was already paid");
+        }
         if(externalApiClient.getRandomNumber() % 2 == 0){
             payment.setStatus(PaymentStatus.SUCCESS);
             kafkaProducerService.sendPaymentEvent(
-                    new PaymentStatusDto(
-                            payment.getOrderId(),
-                            String.valueOf(PaymentStatus.SUCCESS)));
+                    PaymentStatusDto.builder()
+                            .orderId(payment.getOrderId())
+                            .status(String.valueOf(PaymentStatus.SUCCESS))
+                            .amount(payment.getPaymentAmount())
+                            .build());
         }
         else {
             payment.setStatus(PaymentStatus.FAILED);

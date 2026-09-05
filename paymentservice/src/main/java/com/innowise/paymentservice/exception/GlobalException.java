@@ -25,6 +25,15 @@ public class GlobalException {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    @ExceptionHandler(DataException.class)
+    public ResponseEntity<Map<String, String>> handleConflict(DataException ex) {
+        log.info("Conflict: {}", ex.getMessage());
+
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
         log.info("Bad request: {}", ex.getMessage());
