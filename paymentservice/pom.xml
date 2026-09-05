@@ -34,6 +34,7 @@
         <prop.testcontainers.version>1.20.4</prop.testcontainers.version>
         <wiremock.version>3.5.4</wiremock.version>
         <jwt.version>0.12.5</jwt.version>
+        <jacoco.version>0.8.10</jacoco.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -244,6 +245,29 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/jacoco</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 
