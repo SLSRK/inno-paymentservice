@@ -1,0 +1,116 @@
+name: CI Pipeline (paymentservice)
+
+on:
+  push:
+    branches:
+      - pay-0/epic
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3.9.9-eclipse-temurin-21
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build project
+        run: mvn -B -f paymentservice/pom.xml clean compile
+
+
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: maven:3.9.9-eclipse-temurin-21
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Run unit tests with coverage
+        run: mvn -B -f paymentservice/pom.xml clean test jacoco:report
+
+      - name: Verify Jacoco report exists
+        run: ls -la paymentservice/target/site/jacoco/
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: paymentservice/target/site/jacoco/
+
+
+  code_analysis:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build project before SonarCloud
+        run: mvn -B -f paymentservice/pom.xml clean compile -DskipTests
+
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+          path: paymentservice/target/site/jacoco
+
+      - name: Run SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          mvn -B -f paymentservice/pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:4.0.0.4121:sonar \
+            -Dsonar.projectKey=SLSRK_inno-paymentservice \
+            -Dsonar.organization=slsrk \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.java.binaries=target/classes \
+            -Dsonar.junit.reportPaths=target/surefire-reports \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+
+  docker_build:
+    runs-on: ubuntu-latest
+    needs: code_analysis
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_NAME=$(echo "${{ secrets.DOCKER_USERNAME }}/paymentservice" | tr '[:upper:]' '[:lower:]')
+          docker build -t $IMAGE_NAME:${{ github.sha }} ./paymentservice
+          docker push $IMAGE_NAME:${{ github.sha }}
