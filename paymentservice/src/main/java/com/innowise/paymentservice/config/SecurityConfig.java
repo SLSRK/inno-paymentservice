@@ -28,7 +28,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/public/**"
                         ).permitAll()
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter,
                         org.springframework.security
                                 .web.authentication

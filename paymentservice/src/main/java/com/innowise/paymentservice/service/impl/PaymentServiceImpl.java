@@ -65,6 +65,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
         if(externalApiClient.getRandomNumber() % 2 == 0){
             payment.setStatus(PaymentStatus.SUCCESS);
+            paymentRepository.save(payment);
             kafkaProducerService.sendPaymentEvent(
                     PaymentStatusDto.builder()
                             .orderId(payment.getOrderId())
@@ -74,11 +75,12 @@ public class PaymentServiceImpl implements PaymentService {
         }
         else {
             payment.setStatus(PaymentStatus.FAILED);
+            paymentRepository.save(payment);
         }
         log.debug("Paying the payment with the id={}, with status={}",
                 id,
                 payment.getStatus());
-        return paymentMapper.toDto(paymentRepository.save(payment));
+        return paymentMapper.toDto(payment);
     }
 
     @Cacheable(
