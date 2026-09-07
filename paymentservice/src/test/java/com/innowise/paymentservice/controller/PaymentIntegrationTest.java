@@ -96,7 +96,7 @@ public class PaymentIntegrationTest {
         registry.add("spring.kafka.bootstrap-servers", kafkaContainer::getBootstrapServers);
         registry.add("spring.kafka.producer.value-serializer",
                 () -> "org.springframework.kafka.support.serializer.JsonSerializer");
-        registry.add("random.number.api.url", wireMockServer::baseUrl);
+        registry.add("random-number.api.url", wireMockServer::baseUrl);
     }
 
     @AfterEach
