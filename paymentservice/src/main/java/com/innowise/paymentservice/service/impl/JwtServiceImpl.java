@@ -2,6 +2,7 @@ package com.innowise.paymentservice.service.impl;
 
 import com.innowise.paymentservice.service.JwtService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,19 +21,22 @@ public class JwtServiceImpl implements JwtService {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    private Claims validate(String token){
+    private Claims getClaims(String token) {
+        return parse(token).getPayload();
+    }
+
+    private Jws<Claims> parse(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                .parseSignedClaims(token);
     }
 
-    public Long getUserId(String token){
-        return Long.valueOf(validate(token).getSubject());
+    public Long getUserId(String token) {
+        return Long.valueOf(getClaims(token).getSubject());
     }
 
-    public String getRole(String token){
-        return validate(token).get("role", String.class);
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
     }
 }

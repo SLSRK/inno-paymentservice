@@ -13,7 +13,7 @@ public class ExternalApiClient {
 
     private final RestTemplate restTemplate;
 
-    @Value("${random.number.api.url}")
+    @Value("${random-number.api.url}")
     private String randomNumberApiUrl;
 
     public Long getRandomNumber() {

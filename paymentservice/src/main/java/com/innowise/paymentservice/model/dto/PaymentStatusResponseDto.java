@@ -3,7 +3,7 @@ package com.innowise.paymentservice.model.dto;
 import lombok.Builder;
 
 @Builder
-public record PaymentStatusDto(
+public record PaymentStatusResponseDto(
 
         Long orderId,
 

@@ -6,7 +6,7 @@ import com.innowise.paymentservice.exception.NotFoundException;
 import com.innowise.paymentservice.mapper.PaymentMapper;
 import com.innowise.paymentservice.model.dto.PaymentCreateDto;
 import com.innowise.paymentservice.model.dto.PaymentResponseDto;
-import com.innowise.paymentservice.model.dto.PaymentStatusDto;
+import com.innowise.paymentservice.model.dto.PaymentStatusResponseDto;
 import com.innowise.paymentservice.model.dto.SumOfPaymentsDto;
 import com.innowise.paymentservice.model.entity.Payment;
 import com.innowise.paymentservice.model.entity.PaymentStatus;
@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setStatus(PaymentStatus.SUCCESS);
             paymentRepository.save(payment);
             kafkaProducerService.sendPaymentEvent(
-                    PaymentStatusDto.builder()
+                    PaymentStatusResponseDto.builder()
                             .orderId(payment.getOrderId())
                             .status(String.valueOf(PaymentStatus.SUCCESS))
                             .amount(payment.getPaymentAmount())
