@@ -2,7 +2,7 @@ package com.innowise.paymentservice.model.dto;
 
 import java.io.Serializable;
 
-public record SumOfPaymentsDto(
+public record SumOfPaymentsResponseDto(
 
         String sumForUser,
 

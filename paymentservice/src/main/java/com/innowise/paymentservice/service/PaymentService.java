@@ -2,7 +2,7 @@ package com.innowise.paymentservice.service;
 
 import com.innowise.paymentservice.model.dto.PaymentCreateDto;
 import com.innowise.paymentservice.model.dto.PaymentResponseDto;
-import com.innowise.paymentservice.model.dto.SumOfPaymentsDto;
+import com.innowise.paymentservice.model.dto.SumOfPaymentsResponseDto;
 import com.innowise.paymentservice.model.entity.PaymentStatus;
 
 import java.time.LocalDate;
@@ -44,7 +44,7 @@ public interface PaymentService {
      * @param date payment date to filter results;
      * @return returns total sum of the payments, that match the given criteria.
      */
-    SumOfPaymentsDto sumForUser(Long userId, LocalDate date);
+    SumOfPaymentsResponseDto sumForUser(Long userId, LocalDate date);
 
     /**
      * Get total sum of payments for date range for all users
@@ -53,5 +53,5 @@ public interface PaymentService {
      * @param to maximum payment date and time to filter results;
      * @return returns total sum of the payments, that match the given criteria.
      */
-    SumOfPaymentsDto sumForAll(LocalDateTime from, LocalDateTime to);
+    SumOfPaymentsResponseDto sumForAll(LocalDateTime from, LocalDateTime to);
 }

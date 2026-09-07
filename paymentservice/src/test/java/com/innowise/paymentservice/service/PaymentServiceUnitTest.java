@@ -5,7 +5,7 @@ import com.innowise.paymentservice.exception.NotFoundException;
 import com.innowise.paymentservice.mapper.PaymentMapper;
 import com.innowise.paymentservice.model.dto.PaymentCreateDto;
 import com.innowise.paymentservice.model.dto.PaymentResponseDto;
-import com.innowise.paymentservice.model.dto.SumOfPaymentsDto;
+import com.innowise.paymentservice.model.dto.SumOfPaymentsResponseDto;
 import com.innowise.paymentservice.model.entity.Payment;
 import com.innowise.paymentservice.model.entity.PaymentStatus;
 import com.innowise.paymentservice.repository.PaymentRepository;
@@ -160,22 +160,22 @@ public class PaymentServiceUnitTest {
 
         when(mongoTemplate.find(any(Query.class), Mockito.eq(Payment.class)))
                 .thenReturn(List.of(payment1, payment2));
-        SumOfPaymentsDto sumOfPaymentsDto =
+        SumOfPaymentsResponseDto sumOfPaymentsResponseDto =
                 paymentService.sumForUser(1L, LocalDate.of(2026, 8, 20));
 
-        assertEquals("user with id:1", sumOfPaymentsDto.sumForUser());
-        assertEquals("35.00", sumOfPaymentsDto.totalAmount());
+        assertEquals("user with id:1", sumOfPaymentsResponseDto.sumForUser());
+        assertEquals("35.00", sumOfPaymentsResponseDto.totalAmount());
     }
 
     @Test
     void sumForUser_shouldReturnZeroWhenNoPaymentsFound() {
         when(mongoTemplate.find(any(Query.class), Mockito.eq(Payment.class)))
                 .thenReturn(List.of());
-        SumOfPaymentsDto sumOfPaymentsDto =
+        SumOfPaymentsResponseDto sumOfPaymentsResponseDto =
                 paymentService.sumForUser(1L, LocalDate.of(2026, 8, 20));
 
-        assertEquals("user with id:1", sumOfPaymentsDto.sumForUser());
-        assertEquals("0.00", sumOfPaymentsDto.totalAmount());
+        assertEquals("user with id:1", sumOfPaymentsResponseDto.sumForUser());
+        assertEquals("0.00", sumOfPaymentsResponseDto.totalAmount());
     }
 
     @Test
@@ -188,13 +188,13 @@ public class PaymentServiceUnitTest {
         when(mongoTemplate.find(any(Query.class), Mockito.eq(Payment.class)))
                 .thenReturn(List.of(payment1, payment2));
 
-        SumOfPaymentsDto sumOfPaymentsDto = paymentService.sumForAll(
+        SumOfPaymentsResponseDto sumOfPaymentsResponseDto = paymentService.sumForAll(
                 LocalDateTime.of(2026, 8, 20, 0, 0),
                 LocalDateTime.of(2026, 8, 20, 23, 59)
         );
 
-        assertEquals("all", sumOfPaymentsDto.sumForUser());
-        assertEquals("60.00", sumOfPaymentsDto.totalAmount());
+        assertEquals("all", sumOfPaymentsResponseDto.sumForUser());
+        assertEquals("60.00", sumOfPaymentsResponseDto.totalAmount());
     }
 
     @Test
@@ -202,13 +202,13 @@ public class PaymentServiceUnitTest {
         when(mongoTemplate.find(any(Query.class), Mockito.eq(Payment.class)))
                 .thenReturn(List.of());
 
-        SumOfPaymentsDto sumOfPaymentsDto = paymentService.sumForAll(
+        SumOfPaymentsResponseDto sumOfPaymentsResponseDto = paymentService.sumForAll(
                 LocalDateTime.of(2026, 8, 20, 0, 0),
                 LocalDateTime.of(2026, 8, 20, 23, 59)
         );
 
-        assertEquals("all", sumOfPaymentsDto.sumForUser());
-        assertEquals("0.00", sumOfPaymentsDto.totalAmount());
+        assertEquals("all", sumOfPaymentsResponseDto.sumForUser());
+        assertEquals("0.00", sumOfPaymentsResponseDto.totalAmount());
     }
 
     private Payment testPayment() {

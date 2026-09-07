@@ -2,7 +2,7 @@ package com.innowise.paymentservice.controller;
 
 import com.innowise.paymentservice.model.dto.PaymentCreateDto;
 import com.innowise.paymentservice.model.dto.PaymentResponseDto;
-import com.innowise.paymentservice.model.dto.SumOfPaymentsDto;
+import com.innowise.paymentservice.model.dto.SumOfPaymentsResponseDto;
 import com.innowise.paymentservice.model.entity.PaymentStatus;
 import com.innowise.paymentservice.service.PaymentService;
 import jakarta.validation.Valid;
@@ -56,16 +56,16 @@ public class PaymentController {
     @GetMapping("/sum/{id}/{date}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN') or #id == authentication.principal")
-    public SumOfPaymentsDto sumOfPaymentsForUser(@PathVariable Long id,
-                                                 @PathVariable LocalDate date) {
+    public SumOfPaymentsResponseDto sumOfPaymentsForUser(@PathVariable Long id,
+                                                         @PathVariable LocalDate date) {
         return paymentService.sumForUser(id, date);
     }
 
     @GetMapping("/sum/all/{from}/{to}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public SumOfPaymentsDto sumOfPaymentsForAll(@PathVariable LocalDateTime from,
-                                                @PathVariable LocalDateTime to) {
+    public SumOfPaymentsResponseDto sumOfPaymentsForAll(@PathVariable LocalDateTime from,
+                                                        @PathVariable LocalDateTime to) {
         return paymentService.sumForAll(from, to);
     }
 }

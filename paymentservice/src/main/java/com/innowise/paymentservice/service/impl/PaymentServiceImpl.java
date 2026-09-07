@@ -6,8 +6,8 @@ import com.innowise.paymentservice.exception.NotFoundException;
 import com.innowise.paymentservice.mapper.PaymentMapper;
 import com.innowise.paymentservice.model.dto.PaymentCreateDto;
 import com.innowise.paymentservice.model.dto.PaymentResponseDto;
-import com.innowise.paymentservice.model.dto.PaymentStatusResponseDto;
-import com.innowise.paymentservice.model.dto.SumOfPaymentsDto;
+import com.innowise.paymentservice.model.dto.PaymentStatusEventDto;
+import com.innowise.paymentservice.model.dto.SumOfPaymentsResponseDto;
 import com.innowise.paymentservice.model.entity.Payment;
 import com.innowise.paymentservice.model.entity.PaymentStatus;
 import com.innowise.paymentservice.repository.PaymentRepository;
@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setStatus(PaymentStatus.SUCCESS);
             paymentRepository.save(payment);
             kafkaProducerService.sendPaymentEvent(
-                    PaymentStatusResponseDto.builder()
+                    PaymentStatusEventDto.builder()
                             .orderId(payment.getOrderId())
                             .status(String.valueOf(PaymentStatus.SUCCESS))
                             .amount(payment.getPaymentAmount())
@@ -109,8 +109,8 @@ public class PaymentServiceImpl implements PaymentService {
             value = "payments",
             key = "'user-sum:' + #userId + ':' + #date"
     )
-    public SumOfPaymentsDto sumForUser(Long userId, LocalDate date) {
-        return new SumOfPaymentsDto(
+    public SumOfPaymentsResponseDto sumForUser(Long userId, LocalDate date) {
+        return new SumOfPaymentsResponseDto(
                 "user with id:" + userId,
                 sumOfPayments(userId, date.atStartOfDay(), date.atTime(LocalTime.MAX)));
     }
@@ -119,8 +119,8 @@ public class PaymentServiceImpl implements PaymentService {
             value = "payments",
             key = "'all-sum:' + #from + ':' + #to"
     )
-    public SumOfPaymentsDto sumForAll(LocalDateTime from, LocalDateTime to) {
-        return new SumOfPaymentsDto(
+    public SumOfPaymentsResponseDto sumForAll(LocalDateTime from, LocalDateTime to) {
+        return new SumOfPaymentsResponseDto(
                 "all",
                 sumOfPayments(null, from, to));
     }
