@@ -7,8 +7,6 @@ public record PaymentStatusEventDto(
 
         Long orderId,
 
-        String status,
-
         Long amount
 ) {
 }

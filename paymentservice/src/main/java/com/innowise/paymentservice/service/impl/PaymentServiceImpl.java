@@ -69,7 +69,6 @@ public class PaymentServiceImpl implements PaymentService {
             kafkaProducerService.sendPaymentEvent(
                     PaymentStatusEventDto.builder()
                             .orderId(payment.getOrderId())
-                            .status(String.valueOf(PaymentStatus.SUCCESS))
                             .amount(payment.getPaymentAmount())
                             .build());
         }
