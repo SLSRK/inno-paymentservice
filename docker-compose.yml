@@ -1,0 +1,80 @@
+services:
+
+  paymentservice:
+    build: ./paymentservice
+    container_name: paymentservice
+    ports:
+      - "8084:8080"
+    networks:
+      - app-network
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATA_MONGODB_URI: ${MONGO_DB_URI}
+      SPRING_REDIS_HOST: ${REDIS_HOST}
+      SPRING_REDIS_PORT: ${REDIS_PORT}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP}
+      SPRING_KAFKA_PRODUCER_KEY_SERIALIZER: ${KAFKA_KEY_SERIALIZER}
+      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: ${KAFKA_VALUE_SERIALIZER}
+      JWT_SECRET: ${JWT_SECRET}
+      RANDOM_NUMBER_API_URL: ${RANDOM_NUMBER_API_URL}
+    depends_on:
+      - payment-db
+      - redis
+      - kafka
+
+  payment-db:
+    image: mongo:7
+    container_name: payment-db
+    restart: always
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: paymentdb
+    networks:
+      - app-network
+    volumes:
+      - payment_db_data:/data/db
+
+  redis:
+    image: redis:7
+    container_name: paymentservice_redis
+    restart: always
+    ports:
+      - "6381:6379"
+    networks:
+      - app-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    networks:
+      - app-network
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:29093
+
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092,CONTROLLER://kafka:29093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+volumes:
+  payment_db_data:
+
+networks:
+  app-network:
+    external: true
